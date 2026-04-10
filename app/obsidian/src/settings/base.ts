@@ -31,7 +31,7 @@ export class SettingsService extends _SettingsService<Settings> {
   #nativeBinding?: string;
   get nativeBinding(): string {
     if (this.#nativeBinding) return this.#nativeBinding;
-    const binaryFullPath = getBinaryFullPath(this.#plugin.manifest);
+    const binaryFullPath = getBinaryFullPath();
     if (binaryFullPath) {
       this.#nativeBinding = binaryFullPath;
       return this.#nativeBinding;

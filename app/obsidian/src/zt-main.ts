@@ -2,6 +2,8 @@ import "./main.less";
 import "./index.css";
 import "./dialog.less";
 
+process.env.SQLITE_USE_URI = "1";
+
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Plugin } from "obsidian";

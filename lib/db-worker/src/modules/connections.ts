@@ -16,7 +16,7 @@ import type {
 } from "@obzt/database/api";
 // import { use } from "to-use";
 import log from "@log";
-import Database, { DatabaseNotSetError } from "./database";
+import Database, { DatabaseNotSetError, toSqliteUri } from "./database";
 
 function isBBTAfterMigration(db: Database) {
   return db.tableExists("citationkey", BBT_MAIN_DB_NAME);
@@ -146,38 +146,38 @@ export default class Connections {
 type DatabaseStatus = "READY" | "ERROR" | "NOT_INITIALIZED";
 
 function openBetterBibtex(paths: DatabasePaths, db: Database): BBTLoadStatus {
+  const bbtMainUri = toSqliteUri(paths.bbtMain);
   try {
-    db.attachDatabase(
-      `file:${paths.bbtMain}?mode=ro&immutable=1`,
-      BBT_MAIN_DB_NAME,
-    );
+    log.debug(`Attaching bbt main database: ${bbtMainUri}`);
+    db.attachDatabase(bbtMainUri, BBT_MAIN_DB_NAME);
+    log.debug(`Attached bbt main database: ${bbtMainUri}`);
   } catch (err) {
     const { code } = err as { code: string };
     if (code === "SQLITE_CANTOPEN") {
       log.debug(
-        `Unable to open bbt main database, no database found at ${paths.bbtMain}`,
+        `Unable to open bbt main database, no database found at ${bbtMainUri}`,
       );
     } else {
-      log.debug(`Unable to open bbt main database, ${code} @ ${paths.bbtMain}`);
+      log.debug(`Unable to open bbt main database, ${code} @ ${bbtMainUri}`);
     }
     return { bbtMain: false, bbtSearch: null };
   }
   const isAfterMigration = isBBTAfterMigration(db);
   if (isAfterMigration) return { bbtMain: true, bbtSearch: null };
+  const bbtSearchUri = toSqliteUri(paths.bbtSearch);
   try {
-    db.attachDatabase(
-      `file:${paths.bbtSearch}?mode=ro&immutable=1`,
-      BBT_MAIN_DB_NAME,
-    );
+    log.debug(`Attaching bbt search database: ${bbtSearchUri}`);
+    db.attachDatabase(bbtSearchUri, BBT_MAIN_DB_NAME);
+    log.debug(`Attached bbt search database: ${bbtSearchUri}`);
   } catch (err) {
     const { code } = err as { code: string };
     if (code === "SQLITE_CANTOPEN") {
       log.debug(
-        `Unable to open bbt search database, no database found at ${paths.bbtSearch}`,
+        `Unable to open bbt search database, no database found at ${bbtSearchUri}`,
       );
     } else {
       log.debug(
-        `Unable to open bbt search database, ${code} @ ${paths.bbtSearch}`,
+        `Unable to open bbt search database, ${code} @ ${bbtSearchUri}`,
       );
     }
     return { bbtMain: true, bbtSearch: false };
