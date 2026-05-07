@@ -1,6 +1,6 @@
 import { join } from "path";
 import type { DatabaseOptions, DatabasePaths } from "@obzt/database/api";
-import type { OptionalCleanup, Useful } from "@ophidian/core";
+import type { Useful } from "@ophidian/core";
 import {
   calc,
   SettingsService as _SettingsService,
@@ -10,6 +10,8 @@ import type { Component } from "obsidian";
 import { getBinaryFullPath } from "@/install-guide/version";
 import ZoteroPlugin from "@/zt-main";
 import { getDefaultSettings, type Settings } from "./service";
+
+type OptionalCleanup = (() => unknown) | void | undefined | null;
 
 function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
   return (
